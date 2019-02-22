@@ -25,7 +25,7 @@ def detect_save(fname, outbase):
 
 # 逐次処理して結果を出力
 outdir = 'faces'
-for fname in files[0:1]:
+for fname in files:
     imgidm, _ = os.path.splitext(os.path.basename(fname))
     basename = os.path.basename(fname)
     outfname = os.path.join(outdir, basename)

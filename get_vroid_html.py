@@ -55,6 +55,7 @@ def save_htmls(charname, urls_seiga, wait=1):
       f.write(html)
 
 def main():
+  global urls
   charname = "maki"
   url = urls[charname]
   urls = get_urls(url)

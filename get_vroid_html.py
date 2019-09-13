@@ -23,35 +23,42 @@ urls = {
   "akari": "https://wikiwiki.jp/voirosozai/%E7%AB%8B%E3%81%A1%E7%B5%B5%EF%BC%8F%E3%82%A2%E3%82%A4%E3%82%B3%E3%83%B3/%E7%B4%B2%E6%98%9F%E3%81%82%E3%81%8B%E3%82%8A"
 }
 
-charname = "yukari"
-url = urls[charname]
 
-driver.get(url)
+def get_urls(url):
+  driver.get(url)
 
-# seigaのURLだけ集める
-urls_seiga = []
-for elem in driver.find_elements_by_css_selector('a.ext'):
-  url = elem.get_attribute('href')
-  #import pdb; pdb.set_trace()
-  if url.startswith('http://seiga.nicovideo.jp/seiga/im'): # user情報は除く
-    urls_seiga.append(url)
-
-# import pdb; pdb.set_trace()
-# pass
+  # seigaのURLだけ集める
+  urls_seiga = []
+  for elem in driver.find_elements_by_css_selector('a.ext'):
+    url = elem.get_attribute('href')
+    #import pdb; pdb.set_trace()
+    if url.startswith('http://seiga.nicovideo.jp/seiga/im'): # user情報は除く
+      urls_seiga.append(url)
+  return urls_seiga
 
 def seigaid(url):
   id = re.sub('http://seiga.nicovideo.jp/seiga/', '', url)
   return id
 
-# htmlを保存する
-store_dir = 'seiga-html/' + charname
-os.makedirs(store_dir, exist_ok=True)
-for seiga in urls_seiga:
-  id = seigaid(seiga)
-  out_fname = os.path.join(store_dir, "%s.html" % id)
-  driver.get(seiga)
-  print(seiga)
-  time.sleep(1)
-  with open(out_fname, 'w') as f:
-    html = driver.page_source
-    f.write(html)
+def save_htmls(charname, urls_seiga, wait=1):
+  # htmlを保存する
+  store_dir = 'seiga-html/' + charname
+  os.makedirs(store_dir, exist_ok=True)
+  for seiga in urls_seiga:
+    id = seigaid(seiga)
+    out_fname = os.path.join(store_dir, "%s.html" % id)
+    driver.get(seiga)
+    print(seiga)
+    time.sleep(wait)
+    with open(out_fname, 'w') as f:
+      html = driver.page_source
+      f.write(html)
+
+def main():
+  charname = "maki"
+  url = urls[charname]
+  urls = get_urls(url)
+  save_htmls(charname, urls)
+
+if __name__ == "__main__":
+  main()

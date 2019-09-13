@@ -11,7 +11,7 @@ from selenium.webdriver.chrome.options import Options
 
 options = Options()
 options.add_argument('--headless')
-driver = webdriver.Chrome(chrome_options=options)
+driver = webdriver.Chrome(options=options)
 
 urls = {
   "yukari": "https://wikiwiki.jp/voirosozai/%E7%AB%8B%E3%81%A1%E7%B5%B5%EF%BC%8F%E3%82%A2%E3%82%A4%E3%82%B3%E3%83%B3/%E7%B5%90%E6%9C%88%E3%82%86%E3%81%8B%E3%82%8A",
@@ -45,6 +45,7 @@ def seigaid(url):
 
 # htmlを保存する
 store_dir = 'seiga-html/' + charname
+os.makedirs(store_dir, exist_ok=True)
 for seiga in urls_seiga:
   id = seigaid(seiga)
   out_fname = os.path.join(store_dir, "%s.html" % id)

@@ -56,10 +56,9 @@ def save_htmls(charname, urls_seiga, wait=1):
 
 def main():
   global urls
-  charname = "maki"
-  url = urls[charname]
-  urls = get_urls(url)
-  save_htmls(charname, urls)
+  for charname, url in urls.items():
+    urls = get_urls(url)
+    save_htmls(charname, urls)
 
 if __name__ == "__main__":
   main()

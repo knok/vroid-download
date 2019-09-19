@@ -40,6 +40,18 @@ def seigaid(url):
   id = re.sub('http://seiga.nicovideo.jp/seiga/', '', url)
   return id
 
+def retry_get(url, wait=1, retry=3):
+  for i in range(retry):
+    driver.get(url)
+    html = driver.page_source
+    time.sleep(wait)
+    if "Http/1.1 Service Unavailable" in html:
+      continue
+    print(url)
+    return html
+  return ""
+  
+
 def save_htmls(charname, urls_seiga, wait=1):
   # htmlを保存する
   store_dir = 'seiga-html/' + charname
@@ -47,9 +59,10 @@ def save_htmls(charname, urls_seiga, wait=1):
   for seiga in urls_seiga:
     id = seigaid(seiga)
     out_fname = os.path.join(store_dir, "%s.html" % id)
-    driver.get(seiga)
-    print(seiga)
-    time.sleep(wait)
+    html = retry_get(seiga, wait=wait)
+    if html == "":
+      print("cant get %s, skip" % seiga)
+      continue
     with open(out_fname, 'w') as f:
       html = driver.page_source
       f.write(html)

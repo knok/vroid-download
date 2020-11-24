@@ -1,6 +1,6 @@
 # vroid download
 
-voiceroid 立ち絵wikiから画像を取得
+[VOICEROID素材まとめWiki](https://wikiwiki.jp/voirosozai/)から画像を取得
 (サムネイル画像のみ、zipは扱わない)
 
 ## HTMLの取得

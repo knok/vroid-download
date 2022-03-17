@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+import argparse
 import urllib
 import re
 import os
@@ -8,6 +9,10 @@ import time
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+
+p = argparse.ArgumentParser()
+p.add_argument('--save-dir', default='seiga-html')
+args = p.parse_args()
 
 options = Options()
 options.add_argument('--headless')
@@ -56,7 +61,7 @@ def retry_get(url, wait=1, retry=3):
 
 def save_htmls(charname, urls_seiga, wait=1):
   # htmlを保存する
-  store_dir = 'seiga-html/' + charname
+  store_dir = os.path.join(args.save_dir, charname)
   os.makedirs(store_dir, exist_ok=True)
   for seiga in urls_seiga:
     id = seigaid(seiga)

@@ -5,8 +5,15 @@ import glob
 import requests
 import os
 import time
+import argparse
 
 from bs4 import BeautifulSoup
+
+p = argparse.ArgumentParser()
+p.add_argument('--html-dir', default='seiga-html')
+p.add_argument('--save-dir', default='seiga-thumb')
+p.add_argument('--wait', '-w', default=1, type=int)
+args = p.parse_args()
 
 urls = {
   "yukari": "https://wikiwiki.jp/voirosozai/%E7%AB%8B%E3%81%A1%E7%B5%B5%EF%BC%8F%E3%82%A2%E3%82%A4%E3%82%B3%E3%83%B3/%E7%B5%90%E6%9C%88%E3%82%86%E3%81%8B%E3%82%8A",
@@ -15,14 +22,16 @@ urls = {
   "kotonoha": "https://wikiwiki.jp/voirosozai/%E7%AB%8B%E3%81%A1%E7%B5%B5%EF%BC%8F%E3%82%A2%E3%82%A4%E3%82%B3%E3%83%B3/%E7%90%B4%E8%91%89%E8%8C%9C%E3%83%BB%E8%91%B5",
   "kiri": "https://wikiwiki.jp/voirosozai/%E7%AB%8B%E3%81%A1%E7%B5%B5%EF%BC%8F%E3%82%A2%E3%82%A4%E3%82%B3%E3%83%B3/%E6%9D%B1%E5%8C%97%E3%81%8D%E3%82%8A%E3%81%9F%E3%82%93",
   "itako": "https://wikiwiki.jp/voirosozai/%E7%AB%8B%E3%81%A1%E7%B5%B5%EF%BC%8F%E3%82%A2%E3%82%A4%E3%82%B3%E3%83%B3/%E6%9D%B1%E5%8C%97%E3%82%A4%E3%82%BF%E3%82%B3",
-  "akari": "https://wikiwiki.jp/voirosozai/%E7%AB%8B%E3%81%A1%E7%B5%B5%EF%BC%8F%E3%82%A2%E3%82%A4%E3%82%B3%E3%83%B3/%E7%B4%B2%E6%98%9F%E3%81%82%E3%81%8B%E3%82%8A"
+  "akari": "https://wikiwiki.jp/voirosozai/%E7%AB%8B%E3%81%A1%E7%B5%B5%EF%BC%8F%E3%82%A2%E3%82%A4%E3%82%B3%E3%83%B3/%E7%B4%B2%E6%98%9F%E3%81%82%E3%81%8B%E3%82%8A",
+  "rikka": "https://wikiwiki.jp/voirosozai/%E7%AB%8B%E3%81%A1%E7%B5%B5%EF%BC%8F%E3%82%A2%E3%82%A4%E3%82%B3%E3%83%B3/%E5%B0%8F%E6%98%A5%E5%85%AD%E8%8A%B1",
+  "zundamon": "https://wikiwiki.jp/voirosozai/%E7%AB%8B%E3%81%A1%E7%B5%B5%EF%BC%8F%E3%82%A2%E3%82%A4%E3%82%B3%E3%83%B3/%E3%81%9A%E3%82%93%E3%81%A0%E3%82%82%E3%82%93",
 }
 
 def get_char_images(cname):
-    gpat = "seiga-html/%s/*.html" % cname
+    gpat = os.path.join(args.html_dir, cname, "*.html")
     files = glob.glob(gpat)
 
-    outdir = "seiga-thumb/" + cname
+    outdir = os.path.join(args.save_dir, cname)
     os.makedirs(outdir, exist_ok=True)
     for fname in files:
         x = os.path.basename(fname)
@@ -40,7 +49,7 @@ def get_char_images(cname):
         except:
             pass
         print(out_imagefname, url)
-        time.sleep(1)
+        time.sleep(args.wait)
 
 def main():
     global urls

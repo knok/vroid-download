@@ -8,15 +8,40 @@ import time
 
 from bs4 import BeautifulSoup
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+# from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.chrome.webdriver import WebDriver
 
 p = argparse.ArgumentParser()
 p.add_argument('--save-dir', default='seiga-html')
+p.add_argument('--account', '-a', default='')
+p.add_argument('--password', '-p', default='')
+p.add_argument('--no-headless', '-n', default=False, action='store_true')
 args = p.parse_args()
 
+acct = os.environ.get('NICO_ACCT', '')
+if acct == '':
+  acct = args.account
+password = os.environ.get('NICO_PASSWD', '')
+if password == '':
+  password = args.password
+
+def login_nico(driver:WebDriver):
+  driver.get('https://account.nicovideo.jp/login')
+  inp = driver.find_element_by_id('input__mailtel')
+  inp.send_keys(acct)
+  inp = driver.find_element_by_id('input__password')
+  inp.send_keys(password)
+  inp = driver.find_element_by_id('login__submit')
+  inp.click()
+
 options = Options()
-options.add_argument('--headless')
-driver = webdriver.Chrome(options=options)
+if not args.no_headless:
+  options.add_argument('--headless')
+# driver = webdriver.Chrome(options=options)
+driver = webdriver.Firefox(options=options)
+
+login_nico(driver)
 
 urls = {
   "yukari": "https://wikiwiki.jp/voirosozai/%E7%AB%8B%E3%81%A1%E7%B5%B5%EF%BC%8F%E3%82%A2%E3%82%A4%E3%82%B3%E3%83%B3/%E7%B5%90%E6%9C%88%E3%82%86%E3%81%8B%E3%82%8A",

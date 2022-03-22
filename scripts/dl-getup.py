@@ -60,6 +60,7 @@ if args.password != '':
     elem = driver.find_elements_by_css_selector('input.btn.btn-default')
     if len(elem) == 0:
         logger.error('cant find button element')
+        driver.close()
         sys.exit(0)
     elem[0].click()
     time.sleep(10)

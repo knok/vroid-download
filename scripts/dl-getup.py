@@ -73,7 +73,12 @@ if len(elem) > 0:
     elem[0].click()
 
 elem = driver.find_elements_by_css_selector('input.btn.btn-default')
-elem[0].click()
+if len(elem) > 0:
+    elem[0].click()
+else:
+    logger.error('unexpected page, no download button')
+    driver.close()
+    sys.exit(0)
 
 time.sleep(30)
 

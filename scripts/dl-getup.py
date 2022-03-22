@@ -35,21 +35,24 @@ driver:WebDriver = webdriver.Firefox(firefox_profile=profile, options=options)
 
 driver.get(args.url)
 
-elem = driver.find_element_by_name('password')
-if elem is not None:
-    elem.send_keys(args.password)
+if args.password != '':
+    elem = driver.find_element_by_name('password')
+    if elem is not None:
+        elem.send_keys(args.password)
 
-elem = driver.find_elements_by_css_selector('button.is_black')
-if len(elem) > 0:
+    # ad close buttion
+    elem = driver.find_elements_by_css_selector('button.is_black')
+    if len(elem) > 0:
+        elem[0].click()
+
+    # パスワード入力確定
+    elem = driver.find_elements_by_css_selector('input.btn.btn-default')
     elem[0].click()
-
-elem = driver.find_elements_by_css_selector('input.btn.btn-default')
-
+    time.sleep(10)
 
 os.makedirs(dldir, exist_ok=True)
-elem[0].click()
-time.sleep(10)
 
+# ad close buttion
 elem = driver.find_elements_by_css_selector('button.is_black')
 if len(elem) > 0:
     elem[0].click()

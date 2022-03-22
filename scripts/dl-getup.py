@@ -4,12 +4,18 @@ getuploader.com からダウンロードを行う
 """
 
 import os
+import sys
 import argparse
 import time
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.webdriver import WebDriver
+from selenium.common.exceptions import NoSuchElementException
 
 p = argparse.ArgumentParser()
 p.add_argument('url')
@@ -36,9 +42,14 @@ driver:WebDriver = webdriver.Firefox(firefox_profile=profile, options=options)
 driver.get(args.url)
 
 if args.password != '':
-    elem = driver.find_element_by_name('password')
-    if elem is not None:
-        elem.send_keys(args.password)
+    try:
+        elem = driver.find_element_by_name('password')
+        if elem is not None:
+            elem.send_keys(args.password)
+    except NoSuchElementException as e:
+        logger.error(f'no password element: {e}')
+        driver.close()
+        sys.exit(0)
 
     # ad close buttion
     elem = driver.find_elements_by_css_selector('button.is_black')
@@ -47,6 +58,9 @@ if args.password != '':
 
     # パスワード入力確定
     elem = driver.find_elements_by_css_selector('input.btn.btn-default')
+    if len(elem) == 0:
+        logger.error('cant find button element')
+        sys.exit(0)
     elem[0].click()
     time.sleep(10)
 

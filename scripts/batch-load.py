@@ -32,6 +32,14 @@ def logging_error_url(logfile, url):
     with open(logfile, 'a') as f:
         print("error: %s" % url, file=f)
 
+def has_error(logfile, url):
+    with open(logfile) as f:
+        for line in f:
+            _, eurl = line.strip().split()
+            if eurl == url:
+                return True
+    return False
+
 def has_file(outdir):
     files = glob.glob(os.path.join(outdir, '*'))
     if len(files) == 0:
@@ -44,6 +52,10 @@ with open(args.input, 'r') as f:
     for row in reader:
         iid, _, url, passwd = row
         if DOMAIN_GETUP in url:
+            # 過去のエラーチェック
+            if has_error(args.log, url):
+                logger.info(f'url {url} had an fetch error at the last try, skipping')
+                continue
             # ファイルチェック
             outdir = f'{args.out}/{iid}'
             if has_file(outdir):

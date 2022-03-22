@@ -9,12 +9,13 @@ import glob
 import argparse
 import logging
 import dbm
+import csv
 
 import tqdm
 from bs4 import BeautifulSoup
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.WARNING)
 
 db = dbm.open('seiga-info.db', 'c')
 urlpat = re.compile('https?://[\w!?/+\-_~=;.,*&@#$%()\'[\]]+')
@@ -24,6 +25,7 @@ pass_pat_nl = re.compile('(?:PASS|パス)(?:ワード|word)?.*\n\s*[\[(「【]?(
 def get_args() -> argparse.Namespace:
     p = argparse.ArgumentParser()
     p.add_argument('--file-pat', default='seiga-html/*/*.html')
+    p.add_argument('--output', default='dl-list.csv')
     args = p.parse_args()
     return args
 
@@ -69,15 +71,19 @@ def ext_info(text):
 def main():
     args = get_args()
     files = get_files(args.file_pat)
-    for file in tqdm.tqdm(files):
-        # logger.info(file)
-        origurl = fname2url(file)
-        text = ext_description(file)
-        # print(text)
-        url, passwd = ext_info(text)
-        # print(match)
-        # logger.info(f'URL:{url}, pass:{passwd}')
-        print(f'page:{origurl}, download:{url}, pass:{passwd}')
+    with open(args.output, 'w') as w:
+        writer = csv.writer(w)
+        writer.writerow(['id', 'origin', 'dlpage', 'pass'])
+        for i, file in tqdm.tqdm(enumerate(files), total=len(files)):
+            # logger.info(file)
+            origurl = fname2url(file)
+            text = ext_description(file)
+            # print(text)
+            url, passwd = ext_info(text)
+            # print(match)
+            # logger.info(f'URL:{url}, pass:{passwd}')
+            logger.info(f'page:{origurl}, download:{url}, pass:{passwd}')
+            writer.writerow([i, origurl, url, passwd])
 
 if __name__ == '__main__':
     main()

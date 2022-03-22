@@ -18,6 +18,7 @@ logging.basicConfig(level=logging.INFO)
 p = argparse.ArgumentParser()
 p.add_argument('--input', default='dl-list.csv')
 p.add_argument('--out', default='./downloads')
+p.add_argument('--log', default='logfile.txt')
 args = p.parse_args()
 
 cmd = ['python3']
@@ -26,6 +27,10 @@ DOMAIN_GETUP = 'getuploader.com'
 
 # getupload
 cmd += ['scripts/dl-getup.py', '-n']
+
+def logging_error_url(logfile, url):
+    with open(logfile, 'a') as f:
+        print("error: %s" % url, file=f)
 
 def has_file(outdir):
     files = glob.glob(os.path.join(outdir, '*'))
@@ -53,4 +58,6 @@ with open(args.input, 'r') as f:
                 callcmd.append(passwd.strip())
             logger.info(f'call cmd: {callcmd}')
             ret = subprocess.check_call(callcmd)
-        
+            if not has_file(outdir):
+                logging_error_url(args.log, url)
+

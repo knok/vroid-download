@@ -50,7 +50,7 @@ with open(args.input, 'r') as f:
             callcmd.append(outdir)
             if passwd != '':
                 callcmd.append('-p')
-                callcmd.append(passwd)
+                callcmd.append(passwd.strip())
             logger.info(f'call cmd: {callcmd}')
             ret = subprocess.check_call(callcmd)
         

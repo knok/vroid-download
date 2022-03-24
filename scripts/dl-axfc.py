@@ -44,12 +44,12 @@ url = args.url
 if url.find('?key=') < 0:
     # keyをもっていない場合
     if args.password != '':
-        url += f'?key='
+        url += f'?key={args.password}'
     else:
         # パスワード情報なし
         pass
 
-driver.get(args.url)
+driver.get(url)
 
 # キーワードチェック
 try:
@@ -59,7 +59,7 @@ except NoSuchElementException as e:
     driver.close()
     sys.exit(0)
 
-if keyword.text == '':
+if url.find('?key=') < 0:
     keyword.send_keys(args.password)
 
 # ボタンのチェック
@@ -77,6 +77,13 @@ anchors = driver.find_elements_by_css_selector('a')
 for target in anchors:
     if target.text.find('ダウンロードする') > 0:
         break
+os.makedirs(dldir, exist_ok=True)
+# bad page
+if target.text.find('ダウンロードする') < 0:
+    logger.error(f'bad page: pass:{args.password}')
+    driver.close()
+    sys.exit(0)
+
 # ダウンロード開始
 target.click()
 
@@ -84,11 +91,16 @@ anchors = driver.find_elements_by_css_selector('a')
 for target in anchors:
     if target.text.find('こちら') >= 0:
         break
+# bad page:
+if target.text.find('こちら') < 0:
+    logger.error(f'bad page: pass:{args.password}')
+    driver.close()
+    sys.exit(0)
 # 強制ダウンロード
 # target.click()
 link = target.get_attribute('href')
 os.chdir(dldir)
-subprocess.call(['wget', link])
+subprocess.call(['wget', '--no-check-certificate', link], check=True)
 
 time.sleep(5)
 

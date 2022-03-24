@@ -9,6 +9,7 @@ import subprocess
 import argparse
 import glob
 import logging
+import time
 
 from nbformat import read
 
@@ -20,6 +21,7 @@ p.add_argument('--input', default='dl-list.csv')
 p.add_argument('--out', default='./downloads')
 p.add_argument('--log', default='logfile.txt')
 p.add_argument('--type', default='axfc', type=str)
+p.add_argument('--wait', '-w', default=180, type=int)
 args = p.parse_args()
 
 cmd = ['python3']
@@ -48,7 +50,7 @@ def has_file(outdir):
         return False
     return True
 
-def handle_getuploader(iid, url, passwd) -> bool:
+def handle_getuploader(iid, url, passwd, default_args) -> bool:
     # 過去のエラーチェック
     if has_error(args.log, url):
         logger.info(f'url {url} had an fetch error at the last try, skipping')
@@ -58,7 +60,7 @@ def handle_getuploader(iid, url, passwd) -> bool:
     if has_file(outdir):
         logger.warning(f'dir {outdir} has already downloaded file, skipping')
         return False
-    callcmd = cmd.copy()
+    callcmd = default_args.copy()
     callcmd.append(url)
     callcmd.append('-o')
     callcmd.append(outdir)
@@ -77,4 +79,15 @@ with open(args.input, 'r') as f:
     for row in reader:
         iid, _, url, passwd = row
         if DOMAIN_GETUP in url:
-            handle_getuploader(iid, url, passwd)
+            # py_args = ['python3', 'scripts/dl-getup.py', '-n']
+            # handle_getuploader(iid, url, passwd, py_args)
+            pass
+        if DOMAIN_AXFC in url:
+            py_args = ['python3', 'scripts/dl-axfc.py', '-n']
+            ret = handle_getuploader(iid, url, passwd, py_args)
+            if ret is False:
+                logger.info(f'skip url {url}')
+                continue
+            wait = args.wait
+            logger.info(f'wait {wait} sec')
+            time.sleep(wait)

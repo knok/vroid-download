@@ -72,6 +72,7 @@ except NoSuchElementException as e:
 
 # ダウンロードページ遷移
 button.click()
+time.sleep(5)
 
 anchors = driver.find_elements_by_css_selector('a')
 for target in anchors:
@@ -86,6 +87,7 @@ if target.text.find('ダウンロードする') < 0:
 
 # ダウンロード開始
 target.click()
+time.sleep(5)
 
 anchors = driver.find_elements_by_css_selector('a')
 for target in anchors:
@@ -100,7 +102,7 @@ if target.text.find('こちら') < 0:
 # target.click()
 link = target.get_attribute('href')
 os.chdir(dldir)
-subprocess.call(['wget', '--no-check-certificate', link], check=True)
+subprocess.check_call(['wget', '--no-check-certificate', link])
 
 time.sleep(5)
 

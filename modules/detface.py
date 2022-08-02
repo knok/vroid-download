@@ -32,5 +32,5 @@ class FaceDetector:
         diff_y = h * rate - h
         new_x = x - (diff_x // 2)
         new_y = y - (diff_y // 2)
-        ret = list(filter(int, [new_x, new_y, new_w, new_h]))
-        return [new_x, new_y, new_w, new_h]
+        # ret = filter(int, [new_x, new_y, new_w, new_h])
+        return new_x, new_y, new_w, new_h

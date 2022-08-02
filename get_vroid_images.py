@@ -13,8 +13,11 @@ from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.chrome.webdriver import WebDriver
 import requests
+from tqdm import tqdm
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+logging.basicConfig(level=logging.INFO)
 
 p = argparse.ArgumentParser()
 p.add_argument('--save-dir', default='vroid-images')
@@ -51,7 +54,7 @@ login_nico(driver)
 
 start_url = 'https://seiga.nicovideo.jp/search/voiceroid?target=illust_all&sort=&sort=image_view'
 pages_url = 'https://seiga.nicovideo.jp/search/voiceroid?&target=illust_all&sort=image_view&page='
-
+max_pages = 3233
 
 def get_urls(url):
   """
@@ -105,6 +108,7 @@ def save_binary(url, filepath):
         bin_out.write(bytes(data_bytes))
 
 def get_image(save_dir, url):
+  logger.info(f'open {url}')
   driver.get(url)
   image_elem = driver.find_element_by_css_selector('#illust_link')
   img_view_url = image_elem.get_attribute('href') # like https://seiga.nicovideo.jp/image/source/5744216
@@ -112,7 +116,8 @@ def get_image(save_dir, url):
   elem = driver.find_element_by_css_selector('.illust_view_big img')
   img_url = elem.get_attribute('src')
   img_fname = img_url.split('/')[-1]
-  out_imgfname = os.path.join(save_dir, img_fname)
+  out_imgfname = os.path.join(save_dir, img_fname) + '.jpg'
+  logger.info(f'save {img_url} to {out_imgfname}')
   save_binary(img_url, out_imgfname)
 
 def retry_get(url, wait=1, retry=3):
@@ -130,10 +135,14 @@ def retry_get(url, wait=1, retry=3):
 def main():
   global urls
   
-  urls = get_urls(start_url)
+  logger.info(f'open {start_url}')
+  # urls = get_urls(start_url)
   # print(urls)
-  for url in urls:
-    get_image(args.save_dir, url)
+  for page in tqdm(range(1, max_pages+1)):
+    list_url = pages_url + str(page)
+    urls = get_urls(list_url)
+    for url in tqdm(urls):
+      get_image(args.save_dir, url)
 
 if __name__ == "__main__":
   main()
